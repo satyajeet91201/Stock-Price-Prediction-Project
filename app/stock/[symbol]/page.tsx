@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { ArrowLeft, TrendingUp, TrendingDown, Activity } from "lucide-react"
+import { ArrowLeft, TrendingUp, TrendingDown, Activity, Brain } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { ProjectInfoDialog } from "@/components/project-info-dialog"
+import { SentimentIndicator } from "@/components/sentiment-indicator"
 import Link from "next/link"
 import StockChart from "@/components/stock-chart"
 import PredictionChart from "@/components/prediction-chart"
@@ -120,11 +123,14 @@ export default function StockPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading comprehensive stock analysis for {symbol}...</p>
-          <p className="text-sm text-gray-500 mt-2">Fetching real-time data and running ML predictions</p>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/30 border-t-primary mx-auto mb-4"></div>
+            <Brain className="h-6 w-6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-primary" />
+          </div>
+          <p className="text-lg font-semibold mb-2">Analyzing {symbol}</p>
+          <p className="text-muted-foreground">Running AI predictions and sentiment analysis...</p>
         </div>
       </div>
     )
@@ -132,11 +138,11 @@ export default function StockPage() {
 
   if (error || !stockData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">{error || "Stock not found"}</p>
+          <p className="text-muted-foreground mb-4">{error || "Stock not found"}</p>
           <Link href="/">
-            <Button>
+            <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Button>
@@ -147,33 +153,48 @@ export default function StockPage() {
   }
 
   const isPositive = stockData.change >= 0
+  const isIndianStock = symbol.includes(".NS")
+  const currencySymbol = isIndianStock ? "₹" : "$"
   const dataQuality = predictionData?.metadata?.dataQuality
 
+  // Calculate overall sentiment
+  const overallSentiment =
+    predictionData?.metadata?.sentimentScore > 0.1
+      ? "positive"
+      : predictionData?.metadata?.sentimentScore < -0.1
+        ? "negative"
+        : "neutral"
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          </Link>
-          <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold">{symbol}</h1>
-              <Badge variant={stockData.isRealData ? "default" : "secondary"}>
-                {stockData.isRealData ? "Live Data" : "Demo Mode"}
-              </Badge>
-              {symbol.includes(".NS") && <Badge variant="outline">NSE</Badge>}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Link href="/">
+              <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back
+              </Button>
+            </Link>
+            <div className="flex-1">
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  {symbol}
+                </h1>
+                <Badge variant={stockData.isRealData ? "default" : "secondary"}>
+                  {stockData.isRealData ? "Live Data" : "Demo Mode"}
+                </Badge>
+                {isIndianStock && <Badge variant="outline">NSE</Badge>}
+              </div>
+              <p className="text-muted-foreground">AI-powered analysis with real-time predictions</p>
             </div>
-            <p className="text-gray-600">AI-powered analysis with real-time predictions</p>
           </div>
+          <ThemeToggle />
         </div>
 
         {/* Data Quality Notice */}
-        <Alert className="mb-6">
+        <Alert className="mb-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
           <Activity className="h-4 w-4" />
           <AlertDescription>
             {stockData.isRealData
@@ -182,18 +203,20 @@ export default function StockPage() {
           </AlertDescription>
         </Alert>
 
-        {/* Stock Overview */}
-        <div className="grid gap-6 md:grid-cols-4 mb-8">
-          <Card>
+        {/* Stock Overview with Sentiment */}
+        <div className="grid gap-6 md:grid-cols-5 mb-8">
+          <Card className="md:col-span-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Current Price</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Current Price</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {symbol.includes(".NS") ? "₹" : "$"}
+                {currencySymbol}
                 {stockData.price.toFixed(2)}
               </div>
-              <div className={`flex items-center gap-1 text-sm ${isPositive ? "text-green-600" : "text-red-600"}`}>
+              <div
+                className={`flex items-center gap-1 text-sm ${isPositive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
+              >
                 {isPositive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                 {isPositive ? "+" : ""}
                 {stockData.change.toFixed(2)} ({stockData.changePercent.toFixed(2)}%)
@@ -201,60 +224,91 @@ export default function StockPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Day Range</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Day Range</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-lg font-semibold">
-                {symbol.includes(".NS") ? "₹" : "$"}
-                {stockData.low.toFixed(2)} - {symbol.includes(".NS") ? "₹" : "$"}
+                {currencySymbol}
+                {stockData.low.toFixed(2)} - {currencySymbol}
                 {stockData.high.toFixed(2)}
               </div>
-              <div className="text-sm text-gray-600">Low - High</div>
+              <div className="text-sm text-muted-foreground">Low - High</div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Open</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Open</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-lg font-semibold">
-                {symbol.includes(".NS") ? "₹" : "$"}
+                {currencySymbol}
                 {stockData.open.toFixed(2)}
               </div>
-              <div className="text-sm text-gray-600">Today's Open</div>
+              <div className="text-sm text-muted-foreground">Today's Open</div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Previous Close</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Previous Close</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-lg font-semibold">
-                {symbol.includes(".NS") ? "₹" : "$"}
+                {currencySymbol}
                 {stockData.previousClose.toFixed(2)}
               </div>
-              <div className="text-sm text-gray-600">Yesterday</div>
+              <div className="text-sm text-muted-foreground">Yesterday</div>
             </CardContent>
           </Card>
+
+          {/* Sentiment Indicator */}
+          <SentimentIndicator
+            sentiment={overallSentiment}
+            score={predictionData?.metadata?.sentimentScore}
+            changePercent={stockData.changePercent}
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2"
+          />
         </div>
 
         {/* Main Content */}
         <Tabs defaultValue="prediction" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="prediction">AI Prediction</TabsTrigger>
-            <TabsTrigger value="chart">Price Chart</TabsTrigger>
-            <TabsTrigger value="news">News & Sentiment</TabsTrigger>
-            <TabsTrigger value="analysis">Technical Analysis</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+            <TabsTrigger
+              value="prediction"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              AI Prediction
+            </TabsTrigger>
+            <TabsTrigger
+              value="chart"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Price Chart
+            </TabsTrigger>
+            <TabsTrigger
+              value="news"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              News & Sentiment
+            </TabsTrigger>
+            <TabsTrigger
+              value="analysis"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Technical Analysis
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="prediction">
-            <Card>
+            <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
               <CardHeader>
-                <CardTitle>AI-Powered Price Prediction</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-primary" />
+                  AI-Powered Price Prediction
+                </CardTitle>
                 <CardDescription>
                   Machine learning model combining technical analysis, sentiment analysis, and market trends
                 </CardDescription>
@@ -270,7 +324,7 @@ export default function StockPage() {
           </TabsContent>
 
           <TabsContent value="chart">
-            <Card>
+            <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
               <CardHeader>
                 <CardTitle>Historical Price Chart</CardTitle>
                 <CardDescription>
@@ -278,7 +332,7 @@ export default function StockPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <StockChart data={historicalData} />
+                <StockChart data={historicalData} symbol={symbol} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -289,7 +343,7 @@ export default function StockPage() {
 
           <TabsContent value="analysis">
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+              <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
                 <CardHeader>
                   <CardTitle>Technical Indicators</CardTitle>
                 </CardHeader>
@@ -334,7 +388,7 @@ export default function StockPage() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">Moving Average (20)</span>
                         <Badge variant="outline">
-                          {symbol.includes(".NS") ? "₹" : "$"}
+                          {currencySymbol}
                           {(stockData.price * (0.95 + Math.random() * 0.1)).toFixed(2)}
                         </Badge>
                       </div>
@@ -347,7 +401,7 @@ export default function StockPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2">
                 <CardHeader>
                   <CardTitle>Market Sentiment</CardTitle>
                 </CardHeader>
@@ -357,10 +411,10 @@ export default function StockPage() {
                     <Badge
                       className={
                         predictionData?.metadata?.sentimentScore > 0.1
-                          ? "bg-green-100 text-green-800"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                           : predictionData?.metadata?.sentimentScore < -0.1
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
+                            ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
                       }
                     >
                       {predictionData?.metadata?.sentimentScore > 0.1
@@ -380,13 +434,19 @@ export default function StockPage() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Data Source</span>
-                    <Badge className={stockData.isRealData ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}>
+                    <Badge
+                      className={
+                        stockData.isRealData
+                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                          : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                      }
+                    >
                       {stockData.isRealData ? "Live API" : "Demo Mode"}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Prediction Confidence</span>
-                    <Badge className="bg-purple-100 text-purple-800">
+                    <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                       {predictionData?.predictions?.[0]?.confidence
                         ? `${(predictionData.predictions[0].confidence * 100).toFixed(0)}%`
                         : "N/A"}
@@ -398,6 +458,9 @@ export default function StockPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Project Info Dialog */}
+      <ProjectInfoDialog />
     </div>
   )
 }
