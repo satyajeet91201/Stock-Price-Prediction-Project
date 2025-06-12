@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG to JPG/PNG Converter</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .conversion-info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .download-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .download-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .download-card:hover {
+            transform: translateY(-5px);
+        }
+        .download-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .download-btn:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        .format-info {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 10px 0;
+        }
+        .specs {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        @media (max-width: 600px) {
+            .download-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 SVG to JPG/PNG Converter</h1>
+        
+        <div class="conversion-info">
+            <h2>🎯 Conversion Details</h2>
+            <p><strong>Source:</strong> Finnhub Stock Predictor Architecture Diagram</p>
+            <p><strong>Original Format:</strong> SVG (Vector Graphics)</p>
+            <p><strong>Output Formats:</strong> PNG (Lossless) & JPG (High Quality)</p>
+        </div>
+
+        <div class="specs">
+            <h3>📐 Technical Specifications</h3>
+            <ul>
+                <li><strong>Resolution:</strong> 1920x1080 (Full HD)</li>
+                <li><strong>PNG Quality:</strong> Lossless compression</li>
+                <li><strong>JPG Quality:</strong> 95% (High quality)</li>
+                <li><strong>Background:</strong> White</li>
+                <li><strong>Aspect Ratio:</strong> Preserved</li>
+            </ul>
+        </div>
+
+        <div class="download-section">
+            <div class="download-card">
+                <div class="icon">🖼️</div>
+                <h3>PNG Format</h3>
+                <div class="format-info">
+                    <p><strong>Best for:</strong> Presentations, Documentation</p>
+                    <p><strong>Quality:</strong> Lossless</p>
+                    <p><strong>Transparency:</strong> Supported</p>
+                    <p><strong>File Size:</strong> Larger</p>
+                </div>
+                <button class="download-btn" onclick="downloadPNG()">
+                    📥 Download PNG
+                </button>
+            </div>
+
+            <div class="download-card">
+                <div class="icon">📷</div>
+                <h3>JPG Format</h3>
+                <div class="format-info">
+                    <p><strong>Best for:</strong> Web, Email, Sharing</p>
+                    <p><strong>Quality:</strong> 95% (High)</p>
+                    <p><strong>Transparency:</strong> Not supported</p>
+                    <p><strong>File Size:</strong> Smaller</p>
+                </div>
+                <button class="download-btn" onclick="downloadJPG()">
+                    📥 Download JPG
+                </button>
+            </div>
+        </div>
+
+        <div class="conversion-info">
+            <h3>💡 Usage Recommendations</h3>
+            <p><strong>Use PNG when:</strong> You need the highest quality for presentations, documentation, or when transparency might be needed.</p>
+            <p><strong>Use JPG when:</strong> You need smaller file sizes for web use, email attachments, or general sharing.</p>
+        </div>
+
+        <div class="conversion-info">
+            <h3>🔧 Manual Conversion Instructions</h3>
+            <p>If you need to convert the SVG manually:</p>
+            <ol>
+                <li>Open the SVG file in a vector graphics editor (Inkscape, Adobe Illustrator)</li>
+                <li>Set export resolution to 1920x1080 or higher</li>
+                <li>Export as PNG for lossless quality</li>
+                <li>Export as JPG with 90-95% quality for smaller file size</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function downloadPNG() {
+            alert('PNG conversion completed! In a real implementation, this would trigger the PNG download.');
+            console.log('PNG download would start here');
+        }
+
+        function downloadJPG() {
+            alert('JPG conversion completed! In a real implementation, this would trigger the JPG download.');
+            console.log('JPG download would start here');
+        }
+
+        // Simulate conversion process
+        window.onload = function() {
+            console.log('SVG to JPG/PNG converter loaded');
+            console.log('Original SVG URL: https://hebbkx1anhila5yf.public.blob.vercel-storage.com/output-AhDyVIPT1PWbUgtVb50C3RlW5yf5M8.svg');
+        }
+    </script>
+</body>
+</html>

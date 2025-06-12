@@ -129,6 +129,17 @@ export default function PredictionChart({ historical, predictions, metadata }: P
               <Badge variant="outline">Analyzed</Badge>
             </CardContent>
           </Card>
+          {metadata && metadata.dataQuality && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">ML Models</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg font-bold">3 Models</div>
+                <Badge variant="default">Linear + Neural + ARIMA</Badge>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
@@ -225,34 +236,86 @@ export default function PredictionChart({ historical, predictions, metadata }: P
       {/* Model Explanation */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">How Our AI Model Works</CardTitle>
+          <CardTitle className="text-lg">How Our ML Models Work</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="text-center p-3 bg-blue-50 rounded-lg">
+              <div className="font-semibold text-blue-600">Linear Regression</div>
+              <div className="text-xs text-gray-600 mt-1">Trend Analysis</div>
+              <div className="text-xs">
+                R² Score:{" "}
+                {predictions[0]?.mlModels?.linearRegression?.r2
+                  ? (predictions[0].mlModels.linearRegression.r2 * 100).toFixed(1) + "%"
+                  : "N/A"}
+              </div>
+            </div>
+            <div className="text-center p-3 bg-green-50 rounded-lg">
+              <div className="font-semibold text-green-600">Neural Network</div>
+              <div className="text-xs text-gray-600 mt-1">Pattern Recognition</div>
+              <div className="text-xs">
+                Accuracy:{" "}
+                {predictions[0]?.mlModels?.neuralNetwork?.accuracy
+                  ? (predictions[0].mlModels.neuralNetwork.accuracy * 100).toFixed(1) + "%"
+                  : "N/A"}
+              </div>
+            </div>
+            <div className="text-center p-3 bg-purple-50 rounded-lg">
+              <div className="font-semibold text-purple-600">ARIMA Model</div>
+              <div className="text-xs text-gray-600 mt-1">Time Series</div>
+              <div className="text-xs">
+                Accuracy:{" "}
+                {predictions[0]?.mlModels?.arima?.accuracy
+                  ? (predictions[0].mlModels.arima.accuracy * 100).toFixed(1) + "%"
+                  : "N/A"}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mt-4">
             <div className="text-center">
-              <div className="font-semibold text-blue-600">40%</div>
-              <div>Technical Analysis</div>
-              <div className="text-xs text-gray-500">RSI, MACD, Bollinger Bands</div>
+              <div className="font-semibold text-blue-600">50%</div>
+              <div>ML Models</div>
+              <div className="text-xs text-gray-500">Linear + Neural + ARIMA</div>
             </div>
             <div className="text-center">
-              <div className="font-semibold text-green-600">30%</div>
+              <div className="font-semibold text-green-600">20%</div>
+              <div>Technical Analysis</div>
+              <div className="text-xs text-gray-500">RSI, MACD, Bollinger</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold text-purple-600">15%</div>
               <div>Sentiment Analysis</div>
               <div className="text-xs text-gray-500">News & Social Media</div>
             </div>
             <div className="text-center">
-              <div className="font-semibold text-purple-600">20%</div>
-              <div>Trend Analysis</div>
-              <div className="text-xs text-gray-500">Price Momentum</div>
-            </div>
-            <div className="text-center">
-              <div className="font-semibold text-orange-600">10%</div>
-              <div>Volume Analysis</div>
-              <div className="text-xs text-gray-500">Trading Volume Patterns</div>
+              <div className="font-semibold text-orange-600">15%</div>
+              <div>Market Factors</div>
+              <div className="text-xs text-gray-500">Volume & Trends</div>
             </div>
           </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg mt-4">
+            <h4 className="font-semibold mb-2">🤖 Machine Learning Components:</h4>
+            <ul className="text-sm space-y-1">
+              <li>
+                <strong>Linear Regression:</strong> Identifies price trends and momentum
+              </li>
+              <li>
+                <strong>Neural Network:</strong> Learns complex patterns from historical data
+              </li>
+              <li>
+                <strong>ARIMA Model:</strong> Time series forecasting with autoregression
+              </li>
+              <li>
+                <strong>Ensemble Method:</strong> Combines all models for robust predictions
+              </li>
+            </ul>
+          </div>
+
           <p className="text-sm text-gray-600 mt-4">
-            Our machine learning model combines multiple factors to generate predictions. Confidence decreases over time
-            as market uncertainty increases.
+            Our ML system trains on historical data in real-time, combining multiple algorithms for accurate
+            predictions. Model confidence decreases over time as market uncertainty increases.
           </p>
         </CardContent>
       </Card>
